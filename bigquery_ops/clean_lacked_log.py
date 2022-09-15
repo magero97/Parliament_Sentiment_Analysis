@@ -14,16 +14,19 @@ if platform.system() == 'Darwin':
 project_id = os.environ.get("PROJECT_ID")
 bucket_name = os.environ.get("GCS_BUCKET_NAME")
 
+
 def get_bq_client():
     if platform.system() == 'Linux':
         # run at cloud
         client = bigquery.Client()
     elif platform.system() == 'Darwin':
         # run locally
-        credentials = service_account.Credentials.from_service_account_file(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"), scopes=["https://www.googleapis.com/auth/cloud-platform"],)
+        credentials = service_account.Credentials.from_service_account_file(
+            os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"),
+            scopes=["https://www.googleapis.com/auth/cloud-platform"], )
         client = bigquery.Client(credentials=credentials, project=project_id)
 
-    return(client)
+    return client
 
 
 def detect_lacked_log():
@@ -42,7 +45,8 @@ def detect_lacked_log():
         videos.append(row['video_id'])
         channels[row['channel_id']] = videos
 
-    return(file_paths,channels)
+    return file_paths, channels
+
 
 if __name__ == '__main__':
     flg = sys.argv[1]
@@ -53,4 +57,3 @@ if __name__ == '__main__':
     else:
         for channel_id in channels.keys():
             print(channel_id + ':' + ','.join(channels[channel_id]))
-

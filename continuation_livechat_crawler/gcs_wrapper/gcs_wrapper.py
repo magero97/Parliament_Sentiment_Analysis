@@ -6,6 +6,7 @@ import time
 from dotenv import load_dotenv
 from google.cloud import storage as gcs
 
+
 def get_gcs_client():
     if platform.system() == 'Linux':
         # run at cloud
@@ -15,17 +16,18 @@ def get_gcs_client():
         load_dotenv('.env')
         client = gcs.Client.from_service_account_json(os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"))
 
-    return(client)
+    return (client)
+
 
 def check_gcs_file_exists(bucket_name, file_path):
-
     client = get_gcs_client()
     bucket = client.get_bucket(bucket_name)
     blobs = bucket.list_blobs(prefix=file_path)
     for blob in blobs:
         if file_path in blob.name:
-            return(True)
-    return(False)
+            return (True)
+    return (False)
+
 
 def upload_gcs_file_from_dictlist(bucket_name, file_path, result):
     dmplist = []
@@ -38,6 +40,7 @@ def upload_gcs_file_from_dictlist(bucket_name, file_path, result):
     blob.upload_from_string('\n'.join(dmplist))
     print(file_path + " upload success!!")
 
+
 def get_gcs_file_to_dictlist(bucket_name, file_name):
     client = get_gcs_client()
 
@@ -48,7 +51,8 @@ def get_gcs_file_to_dictlist(bucket_name, file_name):
     for line in lines.split('\n'):
         result.append(json.loads(line))
 
-    return(result)
+    return (result)
+
 
 def get_gcs_files(bucket_name, prefix):
     client = get_gcs_client()
@@ -60,7 +64,8 @@ def get_gcs_files(bucket_name, prefix):
                 filename_list.append(blob.name)
         else:
             filename_list.append(blob.name)
-    return(filename_list)
+    return (filename_list)
+
 
 def delete_gcs_file(bucket_name, file_path):
     client = get_gcs_client()
@@ -69,6 +74,7 @@ def delete_gcs_file(bucket_name, file_path):
     blob = bucket.blob(file_path)
     blob.delete()
     print("Object {} deleted".format(file_path))
+
 
 def search_and_destroy_file(bucket_name, file_path):
     client = get_gcs_client()

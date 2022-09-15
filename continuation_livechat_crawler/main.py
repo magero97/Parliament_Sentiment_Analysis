@@ -10,20 +10,22 @@ from google.cloud import pubsub_v1
 from bs4 import BeautifulSoup
 import requests
 
-
 if platform.system() == 'Darwin':
     # run locally
-    load_dotenv('.env')
+    load_dotenv('venv')
 
 bucket_name = os.environ.get("GCS_BUCKET_NAME")
 pubsub_topic = os.environ.get("PUBSUB_TOPIC")
 project_id = os.environ.get("PROJECT_ID")
 
+
 class RestrictedFromYoutube(Exception):
     pass
 
+
 def get_ytInitialData(target_url, session):
-    headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
+    headers = {
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
     html = session.get(target_url, headers=headers)
     soup = BeautifulSoup(html.text, 'html.parser')
     for script in soup.find_all('script'):
@@ -33,22 +35,25 @@ def get_ytInitialData(target_url, session):
                 if 'ytInitialData' in line:
                     if 'var ytInitialData =' in line:
                         st = line.strip().find('var ytInitialData =') + 19
-                        return(json.loads(line.strip()[st:-10]))
+                        return (json.loads(line.strip()[st:-10]))
                     if 'window["ytInitialData"] =' in line:
                         start_pos = line.strip().find('window["ytInitialData"]') + len('window["ytInitialData"] = ')
                         end_pos = len(';</script>') * -1
-                        return(json.loads(line.strip()[start_pos:end_pos]))
+                        return (json.loads(line.strip()[start_pos:end_pos]))
 
     if 'Sorry for the interruption. We have been receiving a large volume of requests from your network.' in str(soup):
         print("restricted from Youtube (Rate limit)")
         raise RestrictedFromYoutube
 
     print("Cannot get ytInitialData")
-    return(None)
+    return (None)
+
 
 def get_continuation(ytInitialData):
-    continuation = ytInitialData['continuationContents']['liveChatContinuation']['continuations'][0].get('liveChatReplayContinuationData', {}).get('continuation')
-    return(continuation)
+    continuation = ytInitialData['continuationContents']['liveChatContinuation']['continuations'][0].get(
+        'liveChatReplayContinuationData', {}).get('continuation')
+    return (continuation)
+
 
 def convert_chatreplay(renderer):
     chatlog = {}
@@ -88,15 +93,16 @@ def convert_chatreplay(renderer):
         chatlog['purchaseAmount'] = ""
         chatlog['type'] = 'NORMALCHAT'
 
-    return(chatlog)
+    return (chatlog)
 
-def get_chat_replay_from_continuation(video_id, continuation, pagecount_limit = 800, is_locally_run = False):
+
+def get_chat_replay_from_continuation(video_id, continuation, pagecount_limit=800, is_locally_run=False):
     count = 1
     pagecount = 1
     continuation_prefix = "https://www.youtube.com/live_chat_replay?continuation="
     session = requests.Session()
     result = []
-    while(pagecount < pagecount_limit):
+    while (pagecount < pagecount_limit):
         if not continuation:
             print("continuation is None. maybe hit the last chat segment")
             break
@@ -164,7 +170,8 @@ def get_chat_replay_from_continuation(video_id, continuation, pagecount_limit = 
             break
 
     print(video_id + " found " + ("%03d" % pagecount) + " pages")
-    return(result, continuation)
+    return result, continuation
+
 
 def main(event, context):
     start = time.time()
@@ -182,10 +189,12 @@ def main(event, context):
             if continuation != new_continuation:
                 publisher = pubsub_v1.PublisherClient()
                 topic_path = publisher.topic_path(project_id, pubsub_topic)
-                future = publisher.publish(topic_path, "continuation".encode('utf-8'), continuation=new_continuation, channel_id=channel_id, video_id=video_id)
+                future = publisher.publish(topic_path, "continuation".encode('utf-8'), continuation=new_continuation,
+                                           channel_id=channel_id, video_id=video_id)
 
     elapsed_time = time.time() - start
     print("{0}".format(elapsed_time) + " sec")
+
 
 if __name__ == '__main__':
     start = time.time()
@@ -200,5 +209,3 @@ if __name__ == '__main__':
 
     elapsed_time = time.time() - start
     print("{0}".format(elapsed_time) + " sec")
-
-
