@@ -46,13 +46,13 @@ def get_ytInitialData(target_url, session):
         raise RestrictedFromYoutube
 
     print("Cannot get ytInitialData")
-    return (None)
+    return None
 
 
 def get_continuation(ytInitialData):
     continuation = ytInitialData['continuationContents']['liveChatContinuation']['continuations'][0].get(
         'liveChatReplayContinuationData', {}).get('continuation')
-    return (continuation)
+    return continuation
 
 
 def convert_chatreplay(renderer):
@@ -102,7 +102,7 @@ def get_chat_replay_from_continuation(video_id, continuation, pagecount_limit=80
     continuation_prefix = "https://www.youtube.com/live_chat_replay?continuation="
     session = requests.Session()
     result = []
-    while (pagecount < pagecount_limit):
+    while pagecount < pagecount_limit:
         if not continuation:
             print("continuation is None. maybe hit the last chat segment")
             break
