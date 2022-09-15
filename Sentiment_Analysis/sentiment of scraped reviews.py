@@ -33,4 +33,4 @@ for i in range(7692):
     n = check_review(a)
     df["Sentiment"][i] = n
 
-df.to_csv("final_chat_log.csv", index=False)
+df.to_csv("final_chat_log_sentiment.csv", index=False)

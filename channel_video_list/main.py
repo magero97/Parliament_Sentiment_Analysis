@@ -15,7 +15,7 @@ from gcs_wrapper import gcs_wrapper
 
 if platform.system() == 'Darwin':
     # run locally
-    load_dotenv('.env')
+    load_dotenv('venv')
 
 bucket_name = os.environ.get("GCS_BUCKET_NAME")
 
@@ -42,7 +42,7 @@ def get_videos(channel_id):
 
     youtube = get_youtube_client()
 
-    # channels.listからupload_idを取得
+    # Get upload_id from channels.list
 
     channels_response = youtube.channels().list(
         id=channel_id,
@@ -156,7 +156,7 @@ def get_new_videos(videos, completed_videos):
 
     diff_videos = list(set(videos) - set(completed_videos))
     print("new videos = " + ("%03d" % len(diff_videos)))
-    return (diff_videos)
+    return diff_videos
 
 
 def main(request):

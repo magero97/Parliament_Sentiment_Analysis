@@ -86,8 +86,8 @@ def check_livechat_replay_disable(ytInitialData):
         conversationBarRenderer = conversationBar.get('conversationBarRenderer', {})
         if conversationBarRenderer:
             text = \
-            conversationBarRenderer.get('availabilityMessage', {}).get('messageRenderer', {}).get('text', {}).get(
-                'runs', [{}])[0].get('text')
+                conversationBarRenderer.get('availabilityMessage', {}).get('messageRenderer', {}).get('text', {}).get(
+                    'runs', [{}])[0].get('text')
             print(text)
             if text == 'Chat replay is not available for this video.':
                 return (True)
@@ -117,8 +117,8 @@ def get_initial_continuation(target_url):
     continue_dict = {}
     try:
         continuations = \
-        ytInitialData['contents']['twoColumnWatchNextResults']['conversationBar']['liveChatRenderer']['header'][
-            'liveChatHeaderRenderer']['viewSelector']['sortFilterSubMenuRenderer']['subMenuItems']
+            ytInitialData['contents']['twoColumnWatchNextResults']['conversationBar']['liveChatRenderer']['header'][
+                'liveChatHeaderRenderer']['viewSelector']['sortFilterSubMenuRenderer']['subMenuItems']
         for continuation in continuations:
             continue_dict[continuation['title']] = continuation['continuation']['reloadContinuationData'][
                 'continuation']
@@ -140,10 +140,11 @@ def get_initial_continuation(target_url):
 
     if not continue_url:
         continue_url = \
-        ytInitialData["contents"]["twoColumnWatchNextResults"].get("conversationBar", {}).get("liveChatRenderer",
-                                                                                              {}).get("continuations",
-                                                                                                      [{}])[0].get(
-            "reloadContinuationData", {}).get("continuation")
+            ytInitialData["contents"]["twoColumnWatchNextResults"].get("conversationBar", {}).get("liveChatRenderer",
+                                                                                                  {}).get(
+                "continuations",
+                [{}])[0].get(
+                "reloadContinuationData", {}).get("continuation")
 
     if not continue_url:
         raise ContinuationURLNotFound
